@@ -2,3 +2,4 @@
 !.gitignore
 !*.go
 !*.md
+!/example1/
