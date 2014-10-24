@@ -19,8 +19,14 @@ func Find(tags []*Tag, hf io.Reader) ([]*html.Node, error) {
 
 	find1(tags[0], n, &roots)
 
-	for _, f := range roots {
-		find2(tags[1:len(tags)], f, &result)
+	if len(tags) == 1 {
+		for _, r := range roots {
+			result = append(result, r)
+		}
+	} else {
+		for _, f := range roots {
+			find2(tags[1:len(tags)], f, &result)
+		}
 	}
 	return result, nil
 }
