@@ -14,10 +14,15 @@ func Find(tags []*Tag, hf io.Reader) ([]*html.Node, error) {
 		return []*html.Node{}, err
 	}
 
+	return FindByNode(tags, n), nil
+}
+
+func FindByNode(tags []*Tag, root *html.Node) []*html.Node {
+
 	roots := make([]*html.Node, 0, 1)
 	result := make([]*html.Node, 0, 1)
 
-	find1(tags[0], n, &roots)
+	find1(tags[0], root, &roots)
 
 	if len(tags) == 1 {
 		for _, r := range roots {
@@ -28,7 +33,7 @@ func Find(tags []*Tag, hf io.Reader) ([]*html.Node, error) {
 			find2(tags[1:len(tags)], f, &result)
 		}
 	}
-	return result, nil
+	return result
 }
 
 func find1(tag *Tag, p *html.Node, found *[]*html.Node) {
