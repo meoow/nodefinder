@@ -22,7 +22,7 @@ body/div.good[id="a b" code=go]/#gogogo/p.download[os=linux arch=x86_64]/a[href=
 ```
 ```html
 <!-- will match this -->
-<body><div class="good" id="a b" code="go">< id="gogogo"><p class="download" os="linux" arch="x86_64"><a href="http://meow.com/" target="_blank">
+<body><div class="good" id="a b" code="go"><div id="gogogo"><p class="download" os="linux" arch="x86_64"><a href="http://meow.com/" target="_blank">
 ```
 
 ####code Example:
