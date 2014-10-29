@@ -1,8 +1,8 @@
 package main
 
 import (
-	"net/http"
 	"github.com/meoow/nodefinder"
+	"net/http"
 )
 import "log"
 import "fmt"
@@ -16,7 +16,7 @@ func main() {
 	}
 	defer resp.Body.Close()
 	fmt.Println("Start Parsing...")
-	tags := nodefinder.TagParser(path)
+	tags := nodefinder.NewPath(path)
 	nodes, err := nodefinder.Find(tags, resp.Body)
 	if err != nil {
 		log.Fatal(err)
