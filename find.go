@@ -4,8 +4,6 @@ import "code.google.com/p/go.net/html"
 import "io"
 import "strings"
 
-//import "fmt"
-
 //Convert path string to []*Elem for further use.
 func NewPath(s string) []*Elem {
 	return Parse(Lex(s))
@@ -132,7 +130,7 @@ func find2(elems []*Elem, idx int, p *html.Node, result *[]*html.Node) {
 
 // Check if e *Elem if empty (contains no tag and attributes).
 func Empty(e *Elem) bool {
-	if e.Tag == "" && len(e.Attr) == 0 {
+	if e.Tag == "" && len(e.Attr) == 0 && e.Nchild == 0 {
 		return true
 	} else {
 		return false
@@ -149,7 +147,7 @@ func Compare(e *Elem, n *html.Node) bool {
 	}
 
 	found := true
-	if e.Tag == n.Data {
+	if e.Tag == n.Data || e.Tag == "" {
 	MATCH1:
 		for key, val := range e.Attr {
 			for _, attr := range n.Attr {
