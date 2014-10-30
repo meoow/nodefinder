@@ -3,20 +3,15 @@ package nodefinder
 import "code.google.com/p/go.net/html"
 import "io"
 import "strings"
-import "sort"
 
 //import "fmt"
 
-type _string []string
-
-func (s _string) Len() int           { return len(s) }
-func (s _string) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s _string) Less(i, j int) bool { return s[i] < s[j] }
-
+//Convert path string to []*Elem for further use.
 func NewPath(s string) []*Elem {
 	return Parse(Lex(s))
 }
 
+//Given a path (converted to []*Elem), find all matched nodes and return their pointers in a slice)
 func Find(elems []*Elem, hf io.Reader) ([]*html.Node, error) {
 	if len(elems) == 0 {
 		return []*html.Node{}, nil
@@ -135,6 +130,7 @@ func find2(elems []*Elem, idx int, p *html.Node, result *[]*html.Node) {
 	}
 }
 
+// Check if e *Elem if empty (contains no tag and attributes).
 func Empty(e *Elem) bool {
 	if e.Tag == "" && len(e.Attr) == 0 {
 		return true
@@ -143,6 +139,7 @@ func Empty(e *Elem) bool {
 	}
 }
 
+//Compare e *Elem and n *html.Node, if they have the same tag, and the attributes of e (if has any) is a subset of ones in n, then return true, otherwise return false.
 func Compare(e *Elem, n *html.Node) bool {
 	if n.Type != html.ElementNode {
 		return false
@@ -151,30 +148,34 @@ func Compare(e *Elem, n *html.Node) bool {
 		return true
 	}
 
-	matched_key_count := 0
+	found := true
 	if e.Tag == n.Data {
+	MATCH1:
 		for key, val := range e.Attr {
 			for _, attr := range n.Attr {
 				if key == attr.Key {
 					tmp1 := strings.Split(val, " ")
 					tmp2 := strings.Split(attr.Val, " ")
-					sort.Sort(_string(tmp1))
-					sort.Sort(_string(tmp2))
-					tmps1 := "\x1f" + strings.Join(tmp1, "\x1f") + "\x1f"
-					tmps2 := "\x1f" + strings.Join(tmp2, "\x1f") + "\x1f"
-					if strings.Contains(tmps2, tmps1) {
-						matched_key_count++
+				MATCH2:
+					for _, t1 := range tmp1 {
+						for _, t2 := range tmp2 {
+							if t1 == t2 {
+								continue MATCH2
+							}
+						}
+						// if found match in inner loop, here will never reach
+						found = false
+						break MATCH1
 					}
+					continue MATCH1
 				}
 			}
+			// if found match in inner loop, here will never reach
+			found = false
+			break
 		}
 	} else {
 		return false
 	}
-	if matched_key_count == len(e.Attr) {
-		return true
-	} else {
-		return false
-	}
-	panic("")
+	return found
 }
