@@ -21,28 +21,6 @@ const (
 	ATTR_SGL     = "ATTR_SGL"
 )
 
-var _rules = [][2]string{
-	{`^/{2,}`, SEPP},
-	{`^/`, SEP},
-	{`^[[:alpha:]][[:alnum:]]*`, TAG},
-	{`^\.[[:alpha:]][[:alnum:]_]*`, CLASS},
-	{`^#[[:alpha:]][[:alnum:]_]*`, ID},
-	{`^:[1-9][0-9]*`, NCHILD},
-	{`^\[`, ATTR_START},
-	{`^\s+`, SKIP},
-}
-
-var _rules_attr = [][2]string{
-	{`^([[:alpha:]][[:alnum:]_]*)\s*=\s*([[:alnum:]_]+)`, ATTR_KEY_VAL},
-	{`^([[:alpha:]][[:alnum:]_]*)\s*=\s*("[^"]*")`, ATTR_KEY_VAL},
-	{`^([[:alpha:]][[:alnum:]_]*)\s*=\s*('[^']*')`, ATTR_KEY_VAL},
-	{`^([[:alpha:]][[:alnum:]_]*)`, ATTR_SGL},
-	{`^("[^"]+")`, ATTR_SGL},
-	{`^('[^']+')`, ATTR_SGL},
-	{`^\]`, ATTR_END},
-	{`^\s+`, SKIP},
-}
-
 type Token struct {
 	Text string
 	Tag  string
@@ -53,19 +31,28 @@ type Rule struct {
 	Tag     string
 }
 
-var Rules []*Rule
-var RulesAttr []*Rule
+var _rec = regexp.MustCompile
 
-func init() {
-	Rules = make([]*Rule, 0, len(_rules))
-	RulesAttr = make([]*Rule, 0, len(_rules_attr))
-	for _, r := range _rules {
-		Rules = append(Rules, &Rule{regexp.MustCompile(r[0]), r[1]})
-	}
+var Rules = []*Rule{
+	&Rule{_rec(`^/{2,}`), SEPP},
+	&Rule{_rec(`^/`), SEP},
+	&Rule{_rec(`^[[:alpha:]][[:alnum:]]*`), TAG},
+	&Rule{_rec(`^\.[[:alpha:]][[:alnum:]_]*`), CLASS},
+	&Rule{_rec(`^#[[:alpha:]][[:alnum:]_]*`), ID},
+	&Rule{_rec(`^:[1-9][0-9]*`), NCHILD},
+	&Rule{_rec(`^\[`), ATTR_START},
+	&Rule{_rec(`^\s+`), SKIP},
+}
 
-	for _, r := range _rules_attr {
-		RulesAttr = append(RulesAttr, &Rule{regexp.MustCompile(r[0]), r[1]})
-	}
+var RulesAttr = []*Rule{
+	&Rule{_rec(`^([[:alpha:]][[:alnum:]_]*)\s*=\s*([[:alnum:]_]+)`), ATTR_KEY_VAL},
+	&Rule{_rec(`^([[:alpha:]][[:alnum:]_]*)\s*=\s*("[^"]*")`), ATTR_KEY_VAL},
+	&Rule{_rec(`^([[:alpha:]][[:alnum:]_]*)\s*=\s*('[^']*')`), ATTR_KEY_VAL},
+	&Rule{_rec(`^([[:alpha:]][[:alnum:]_]*)`), ATTR_SGL},
+	&Rule{_rec(`^("[^"]+")`), ATTR_SGL},
+	&Rule{_rec(`^('[^']+')`), ATTR_SGL},
+	&Rule{_rec(`^\]`), ATTR_END},
+	&Rule{_rec(`^\s+`), SKIP},
 }
 
 func Lex(str string) []*Token {
