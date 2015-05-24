@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"github.com/meoow/nodefinder"
@@ -61,9 +62,11 @@ func main() {
 
 	for _, i := range nodes {
 		if inner {
+			buf := &bytes.Buffer{}
 			for j := i.FirstChild; j != nil; j = j.NextSibling {
-				html.Render(os.Stdout, j)
+				html.Render(buf, j)
 			}
+			fmt.Print(html.UnescapeString(buf.String()))
 		} else {
 			html.Render(os.Stdout, i)
 		}
