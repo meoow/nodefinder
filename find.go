@@ -1,6 +1,6 @@
 package nodefinder
 
-import "code.google.com/p/go.net/html"
+import "golang.org/x/net/html"
 import "io"
 import "strings"
 
