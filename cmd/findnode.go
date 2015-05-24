@@ -15,10 +15,12 @@ func usage() {
 }
 
 var input string
+var inner bool
 
 func init() {
 	flag.Usage = usage
-	flag.StringVar(&input, "i", "", "input file")
+	flag.StringVar(&input, "i", "", "input html file")
+	flag.BoolVar(&inner, "I", false, "print inner contents of matched tags only")
 }
 
 func main() {
@@ -58,6 +60,12 @@ func main() {
 	}
 
 	for _, i := range nodes {
-		html.Render(os.Stdout, i)
+		if inner {
+			for j := i.FirstChild; j != nil; j = j.NextSibling {
+				html.Render(os.Stdout, j)
+			}
+		} else {
+			html.Render(os.Stdout, i)
+		}
 	}
 }
