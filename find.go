@@ -1,6 +1,6 @@
 package nodefinder
 
-import "code.google.com/p/go.net/html"
+import "golang.org/x/net/html"
 import "io"
 import "strings"
 
@@ -28,19 +28,27 @@ func FindByNode(elems []*Elem, root *html.Node) []*html.Node {
 	roots := make([]*html.Node, 0, 1)
 	result := make([]*html.Node, 0, 1)
 
+	var sp int //startpoint for searching
 	if Compare(elems[0], root) {
 		roots = append(roots, root)
 	} else {
 		if elems[0].Root {
 			return roots
 		} else {
-			find1(elems[0], root, &roots)
+			for i, e := range elems {
+				if Empty(e) || e.Tag == ".." {
+					continue
+				}
+				sp = i
+				find1(elems[i], root, &roots)
+				break
+			}
 		}
 	}
-	if len(elems) == 1 {
-		if elems[0].Nchild != 0 {
-			if elems[0].Nchild <= len(roots) {
-				return roots[elems[0].Nchild-1 : elems[0].Nchild]
+	if len(elems) == sp+1 {
+		if elems[sp].Nchild != 0 {
+			if elems[sp].Nchild <= len(roots) {
+				return roots[elems[sp].Nchild-1 : elems[sp].Nchild]
 			} else {
 				return []*html.Node{}
 			}
@@ -48,15 +56,15 @@ func FindByNode(elems []*Elem, root *html.Node) []*html.Node {
 			return roots
 		}
 	} else {
-		if elems[0].Nchild != 0 {
-			if elems[0].Nchild <= len(roots) {
-				find2(elems, 1, roots[elems[0].Nchild-1], &result)
+		if elems[sp].Nchild != 0 {
+			if elems[sp].Nchild <= len(roots) {
+				find2(elems, sp+1, roots[elems[sp].Nchild-1], &result)
 			} else {
 				return []*html.Node{}
 			}
 		} else {
 			for _, f := range roots {
-				find2(elems, 1, f, &result)
+				find2(elems, sp+1, f, &result)
 			}
 		}
 	}
@@ -79,6 +87,16 @@ func find2(elems []*Elem, idx int, p *html.Node, result *[]*html.Node) {
 	if idx >= len(elems) {
 		return
 	}
+
+	if elems[idx].Tag == ".." && p.Parent != nil {
+		if idx == len(elems)-1 {
+			*result = append(*result, p.Parent)
+			return
+		} else {
+			find2(elems, idx+1, p.Parent, result)
+		}
+	}
+
 	match_count := 0
 	for c := p.FirstChild; c != nil; c = c.NextSibling {
 		if c.Type != html.ElementNode {
@@ -144,6 +162,14 @@ func Compare(e *Elem, n *html.Node) bool {
 	}
 	if Empty(e) {
 		return true
+	}
+
+	if e.Tag == ".." {
+		if n.Parent != nil && n.Parent.Type == html.ElementNode {
+			return true
+		} else {
+			return false
+		}
 	}
 
 	found := true

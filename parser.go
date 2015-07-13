@@ -38,6 +38,8 @@ func Parse(toks []*Token) []*Elem {
 				lastElem = &Elem{Attr: make(map[string]string, 0)}
 				elems = append(elems, lastElem)
 			}
+		case PARENT:
+			fallthrough
 		case TAG:
 			lastElem.Tag = tok.Text
 		case CLASS:

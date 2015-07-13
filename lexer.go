@@ -19,6 +19,7 @@ const (
 	ATTR_END     = "ATTRS_END"
 	ATTR_KEY_VAL = "ATTR_KEY_VAL"
 	ATTR_SGL     = "ATTR_SGL"
+	PARENT       = "PARENT"
 )
 
 type Token struct {
@@ -36,6 +37,7 @@ var _rec = regexp.MustCompile
 var Rules = []*Rule{
 	&Rule{_rec(`^/{2,}`), SEPP},
 	&Rule{_rec(`^/`), SEP},
+	&Rule{_rec(`^\.\.`), PARENT},
 	&Rule{_rec(`^[[:alpha:]][[:alnum:]]*`), TAG},
 	&Rule{_rec(`^\.[[:alpha:]][[:alnum:]_-]*`), CLASS},
 	&Rule{_rec(`^#[[:alpha:]][[:alnum:]_-]*`), ID},
@@ -59,6 +61,7 @@ func Lex(str string) []*Token {
 	tokens := make([]*Token, 0, 1)
 	pos := 0
 	inAttrsLex := false
+
 	strbytes := []byte(str)
 
 	for len(strbytes) > 0 {
@@ -81,6 +84,8 @@ func Lex(str string) []*Token {
 						tokens = append(tokens, &Token{"/", rule.Tag})
 					case NCHILD:
 						tokens = append(tokens, &Token{string(strbytes[index[0]+1 : index[1]]), rule.Tag})
+					case PARENT:
+						tokens = append(tokens, &Token{"..", rule.Tag})
 
 					}
 					strbytes = strbytes[index[1]:]
