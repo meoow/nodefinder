@@ -12,7 +12,7 @@ This library finds all nodes in html file given specific path.
 4. **div#id1** div tag with id="id1".  
 5. **//** matches children in any depth. Leading // in path will be ignored.  
 6. **table[a=b c=good sometag='c1 c2 c3' ]** attributes key-value pairs are listed in square brackets, if multiple values are needed, put them in single/double quotes, the order is insignificant.  
-7. **..** back to the parent node of the node matches the previous rule.
+7. **..** back to the parent node of the node matches the previous rule.  
 8. **td:3** matches the 3rd occurence of tag td with class="class2".  
 
 ####path example:
