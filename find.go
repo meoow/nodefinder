@@ -88,7 +88,7 @@ func find2(elems []*Elem, idx int, p *html.Node, result *[]*html.Node) {
 		return
 	}
 
-	if elems[idx].Tag == ".." && p.Parent != nil {
+	if elems[idx].Tag == ".." && p.Parent.Parent != nil {
 		if idx == len(elems)-1 {
 			*result = append(*result, p.Parent)
 			return
